@@ -8,6 +8,15 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
   "memberId": "7734347",
   "scheduledTime": "2023-12-01T11:00:00+00:00"
 }
+### POST schedule out
+POST https://gym-scheduler-nebp.onrender.com/api/schedule
+Content-Type: application/json
+Authorization: Basic ZmlsaXA6MixOLFYoMzhUcTs5
+
+{
+  "id": "33243027",
+  "scheduledTime": "2025-04-21T18:31:00+00:00"
+}
 ### GET schedule
 GET http://localhost:8080/api/schedule/process/33243027
 Authorization: Basic dXNlcjpwYXNzd29yZA==
@@ -15,3 +24,8 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 ### GET schedule
 GET http://localhost:8080/api/schedule/list/2
 Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+### GET schedule
+GET https://gym-scheduler-nebp.onrender.com/api/schedule/list/2
+Content-Type: application/json
+Authorization: Basic ZmlsaXA6MixOLFYoMzhUcTs5

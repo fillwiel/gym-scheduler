@@ -3,6 +3,7 @@ package com.wielkopolan.gymscheduler.service;
 import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import com.wielkopolan.gymscheduler.repository.ScheduledTaskRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SchedulerService {
 
@@ -21,11 +23,13 @@ public class SchedulerService {
     private final RequestSenderService senderService;
     private final ZoneId zoneId;
     private final String defaultMemberId;
+    private final int numberOfDaysEndRange;
 
-    public SchedulerService(ScheduledTaskRepository repository, RequestSenderService senderService, @Value("${app.default.memberId}") final String defaultMemberId) {
+    public SchedulerService(ScheduledTaskRepository repository, RequestSenderService senderService, @Value("${app.default.memberId}") final String defaultMemberId, @Value("${app.days.range}") final int numberOfDaysEndRange) {
         this.repository = repository;
         this.senderService = senderService;
         this.defaultMemberId = defaultMemberId;
+        this.numberOfDaysEndRange = numberOfDaysEndRange;
         this.zoneId = ZoneId.of("Europe/Warsaw");
     }
 
@@ -40,6 +44,7 @@ public class SchedulerService {
     //TODO remove when testing is done
     @Scheduled(cron = "0 * * * * *", zone = "Europe/Warsaw")
     public void processDueTasksEveryMinute() {
+        log.info("Processing due tasks every minute");
         processDueTasks();
     }
 
@@ -50,12 +55,17 @@ public class SchedulerService {
 
     public void processDueTasks() {
         final var now = ZonedDateTime.now(zoneId).toInstant();
-        var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(now);
+        final var endOfRange = ZonedDateTime.now(zoneId).plusDays(numberOfDaysEndRange).toLocalDate().atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
+
+        var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(endOfRange);
+        log.info("Found {} due tasks to process", dueTasks.size());
         for (var task : dueTasks) {
-            boolean success = senderService.sendPostRequest(task);
-            if (success) {
-                task.setProcessed(true);
-                repository.save(task);
+            if (task.getScheduledTime().isAfter(now) || task.getScheduledTime().equals(now)) {
+                boolean success = senderService.sendPostRequest(task);
+                if (success) {
+                    task.setProcessed(true);
+                    repository.save(task);
+                }
             }
         }
     }

@@ -1,0 +1,82 @@
+package com.wielkopolan.gymscheduler.service;
+
+import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
+import com.wielkopolan.gymscheduler.entity.ScheduledTask;
+import com.wielkopolan.gymscheduler.repository.ScheduledTaskRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+@Service
+public class SchedulerService {
+
+    private final ScheduledTaskRepository repository;
+    private final RequestSenderService senderService;
+    private final ZoneId zoneId;
+    private final String defaultMemberId;
+
+    public SchedulerService(ScheduledTaskRepository repository, RequestSenderService senderService, @Value("${app.default.memberId}") final String defaultMemberId) {
+        this.repository = repository;
+        this.senderService = senderService;
+        this.defaultMemberId = defaultMemberId;
+        this.zoneId = ZoneId.of("Europe/Warsaw");
+    }
+
+    public void scheduleRequest(ScheduleRequestDTO dto) {
+        ScheduledTask task = new ScheduledTask();
+        task.setMemberId(defaultMemberId);
+        task.setId(dto.id());
+        task.setScheduledTime(convertTime(dto.scheduledTime()));
+        repository.save(task);
+    }
+
+    //TODO remove when testing is done
+    @Scheduled(cron = "0 * * * * *", zone = "Europe/Warsaw")
+    public void processDueTasksEveryMinute() {
+        processDueTasks();
+    }
+
+    @Scheduled(cron = "0 0 6 * * *", zone = "Europe/Warsaw")
+    public void processDueTasksDaily() {
+        processDueTasks();
+    }
+
+    public void processDueTasks() {
+        final var now = ZonedDateTime.now(zoneId).toInstant();
+        var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(now);
+        for (var task : dueTasks) {
+            boolean success = senderService.sendPostRequest(task);
+            if (success) {
+                task.setProcessed(true);
+                repository.save(task);
+            }
+        }
+    }
+
+    public void processTask(final String id) {
+        repository.findById(id).ifPresent(this::processTask);
+    }
+
+    private void processTask(ScheduledTask task) {
+        boolean success = senderService.sendPostRequest(task);
+        if (success) {
+            task.setProcessed(true);
+            repository.save(task);
+        }
+    }
+
+    public List<ScheduledTask> getTask(final String id) {
+        return repository.findAllById(List.of(id));
+    }
+
+    private static Instant convertTime(final OffsetDateTime dateTime) {
+        return dateTime.toInstant().atZone(ZoneOffset.UTC).toInstant();
+    }
+}

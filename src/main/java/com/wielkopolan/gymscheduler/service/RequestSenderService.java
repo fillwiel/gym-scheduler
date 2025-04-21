@@ -1,11 +1,11 @@
 package com.wielkopolan.gymscheduler.service;
 
+import com.wielkopolan.gymscheduler.dto.GymResponseBody;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -22,7 +22,7 @@ public class RequestSenderService {
 
     public boolean sendPostRequest(ScheduledTask task) {
         try {
-            client.post()
+            var response = client.post()
                     .uri("/Schedule/RegisterForClass")
                     .header("Accept", "*/*")
                     .header("Accept-Language", "pl,en-US;q=0.9,en;q=0.8,pt-PT;q=0.7,pt;q=0.6")
@@ -32,16 +32,18 @@ public class RequestSenderService {
                     .header("Origin", "https://atmosfera-lodz.cms.efitness.com.pl")
                     .bodyValue("id=" + task.getId() + "&memberID=" + task.getMemberId() + "&promoCodeID=&promoCode=&g-recaptcha-response=")
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .doOnNext(body -> log.info("Response: {}", body)) // Log the response body
-                    .onErrorResume(e -> {
-                        log.error("Error during request: {}", e.getMessage());
-                        return Mono.empty();
-                    })
+                    .bodyToMono(GymResponseBody.class)
                     .block();
 
-            return true;
+            if (response != null && response.success()) {
+                log.info("Request successful: {}", response.successMessage());
+                return true;
+            } else {
+                log.warn("Request failed: {}", response != null ? response.errorMessage() : "No response");
+                return false;
+            }
         } catch (Exception e) {
+            log.error("Error during request: {}", e.getMessage());
             return false;
         }
     }

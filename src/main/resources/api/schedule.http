@@ -11,7 +11,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 ### POST schedule out
 POST https://gym-scheduler-nebp.onrender.com/api/schedule
 Content-Type: application/json
-Authorization: Basic ZmlsaXA6MixOLFYoMzhUcTs5
+Authorization: Basic dXNlcjpwYXNzd29yZA==
 
 {
   "id": "33243027",
@@ -28,7 +28,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 ### GET schedule
 GET https://gym-scheduler-nebp.onrender.com/api/schedule/list/2
 Content-Type: application/json
-Authorization: Basic ZmlsaXA6MixOLFYoMzhUcTs5
+Authorization: Basic dXNlcjpwYXNzd29yZA==
 
 ### GET home
 GET https://gym-scheduler-nebp.onrender.com/

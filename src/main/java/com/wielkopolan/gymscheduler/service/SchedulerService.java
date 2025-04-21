@@ -3,6 +3,7 @@ package com.wielkopolan.gymscheduler.service;
 import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import com.wielkopolan.gymscheduler.repository.ScheduledTaskRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,10 +42,9 @@ public class SchedulerService {
         repository.save(task);
     }
 
-    //TODO remove when testing is done
-    @Scheduled(cron = "0 * * * * *", zone = "Europe/Warsaw")
-    public void processDueTasksEveryMinute() {
-        log.info("Processing due tasks every minute");
+    @PostConstruct
+    public void processDueTasksOnStartup() {
+        log.info("Processing due tasks on server startup...");
         processDueTasks();
     }
 

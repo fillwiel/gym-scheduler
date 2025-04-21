@@ -70,8 +70,11 @@ public class SchedulerService {
     private void processTask(ScheduledTask task) {
         boolean success = senderService.sendPostRequest(task);
         if (success) {
+            log.info("Successfully signed up for class with ID {}", task.getId());
             task.setProcessed(true);
             repository.save(task);
+        } else {
+            log.warn("Failed to sign up for class with ID {}", task.getId());
         }
     }
 

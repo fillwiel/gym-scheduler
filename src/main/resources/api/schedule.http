@@ -29,3 +29,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 GET https://gym-scheduler-nebp.onrender.com/api/schedule/list/2
 Content-Type: application/json
 Authorization: Basic ZmlsaXA6MixOLFYoMzhUcTs5
+
+### GET home
+GET https://gym-scheduler-nebp.onrender.com/
+Content-Type: application/json

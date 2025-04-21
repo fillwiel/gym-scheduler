@@ -54,19 +54,12 @@ public class SchedulerService {
     }
 
     public void processDueTasks() {
-        final var now = ZonedDateTime.now(zoneId).toInstant();
         final var endOfRange = ZonedDateTime.now(zoneId).plusDays(numberOfDaysEndRange).toLocalDate().atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
 
         var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(endOfRange);
         log.info("Found {} due tasks to process", dueTasks.size());
         for (var task : dueTasks) {
-            if (task.getScheduledTime().isAfter(now) || task.getScheduledTime().equals(now)) {
-                boolean success = senderService.sendPostRequest(task);
-                if (success) {
-                    task.setProcessed(true);
-                    repository.save(task);
-                }
-            }
+            processTask(task);
         }
     }
 

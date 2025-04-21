@@ -2,20 +2,21 @@
 FROM eclipse-temurin:23-jdk-alpine as builder
 WORKDIR /app
 
-# Copy Gradle files separately to leverage Docker caching
-COPY gradle gradle
+# Copy the Gradle config and wrapper first for caching
 COPY gradlew build.gradle settings.gradle ./
-RUN ./gradlew build -x test || return 0
+COPY gradle gradle
 
-# Copy the rest of the source and build again
-COPY . .
-RUN ./gradlew clean build -x test
+# Now copy source files
+COPY src src
 
-# Stage 2: Run the application
+# Now run build
+RUN ./gradlew build -x test
+
+# Second stage: run the app
 FROM eclipse-temurin:23-jdk-alpine
-VOLUME /tmp
 
-ARG JAR_FILE=app.jar
-COPY --from=builder /app/build/libs/*.jar ${JAR_FILE}
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,7 +1,7 @@
 ### POST schedule
 POST http://localhost:8080/api/schedule
 Content-Type: application/json
-Authorization: Basic dXNlcjpwYXNzd29yZA==
+Authorization: Basic asd
 
 {
   "id": "2",
@@ -11,7 +11,7 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 ### POST schedule out
 POST https://gym-scheduler-nebp.onrender.com/api/schedule
 Content-Type: application/json
-Authorization: Basic dXNlcjpwYXNzd29yZA==
+Authorization: Basic asd
 
 {
   "id": "33243027",
@@ -19,16 +19,16 @@ Authorization: Basic dXNlcjpwYXNzd29yZA==
 }
 ### GET schedule
 GET http://localhost:8080/api/schedule/process/33243027
-Authorization: Basic dXNlcjpwYXNzd29yZA==
+Authorization: Basic asd
 
 ### GET schedule
 GET http://localhost:8080/api/schedule/list/2
-Authorization: Basic dXNlcjpwYXNzd29yZA==
+Authorization: Basic asd
 
 ### GET schedule
 GET https://gym-scheduler-nebp.onrender.com/api/schedule/list/2
 Content-Type: application/json
-Authorization: Basic dXNlcjpwYXNzd29yZA==
+Authorization: Basic asd
 
 ### GET home
 GET https://gym-scheduler-nebp.onrender.com/

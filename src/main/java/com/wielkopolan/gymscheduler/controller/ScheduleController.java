@@ -14,7 +14,7 @@ public class ScheduleController {
 
     private final SchedulerService schedulerService;
 
-    public ScheduleController(SchedulerService schedulerService) {
+    public ScheduleController(final SchedulerService schedulerService) {
         this.schedulerService = schedulerService;
     }
 

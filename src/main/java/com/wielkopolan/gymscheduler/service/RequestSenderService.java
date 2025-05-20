@@ -14,15 +14,15 @@ public class RequestSenderService {
     private final WebClient client;
     private final String authCookieToken;
 
-    public RequestSenderService(WebClient.Builder builder,
-                                @Value("${auth.cookie.token}") String authCookieToken) {
+    public RequestSenderService(final WebClient.Builder builder,
+                                @Value("${auth.cookie.token}") final String authCookieToken) {
         this.client = builder.baseUrl("https://atmosfera-lodz.cms.efitness.com.pl").build();
         this.authCookieToken = authCookieToken;
     }
 
-    public boolean sendPostRequest(ScheduledTask task) {
+    public boolean sendPostRequest(final ScheduledTask task) {
         try {
-            var response = client.post()
+            final var response = client.post()
                     .uri("/Schedule/RegisterForClass")
                     .header("Accept", "*/*")
                     .header("Accept-Language", "pl,en-US;q=0.9,en;q=0.8,pt-PT;q=0.7,pt;q=0.6")
@@ -42,7 +42,7 @@ public class RequestSenderService {
                 log.warn("Request failed: {}", response != null ? response.errorMessage() : "No response");
                 return false;
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("Error during request: {}", e.getMessage());
             return false;
         }

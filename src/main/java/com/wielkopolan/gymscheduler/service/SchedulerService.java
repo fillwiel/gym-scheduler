@@ -67,7 +67,7 @@ public class SchedulerService {
         repository.findById(id).ifPresent(this::processTask);
     }
 
-    private void processTask(ScheduledTask task) {
+    private void processTask(final ScheduledTask task) {
         boolean success = senderService.sendPostRequest(task);
         if (success) {
             log.info("Successfully signed up for class with ID {}", task.getId());

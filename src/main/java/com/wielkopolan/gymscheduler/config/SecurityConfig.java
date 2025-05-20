@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/schedule/**").hasRole("USER")
@@ -46,9 +46,9 @@ class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsManager users(DataSource dataSource,
-                                    @Value("${app.api.username}") String username,
-                                    @Value("${app.api.password}") String password) {
+    public UserDetailsManager users(final DataSource dataSource,
+                                    @Value("${app.api.username}") final String username,
+                                    @Value("${app.api.password}") final String password) {
         UserDetails user = User.withUsername(username)
                 .password(password)
                 .roles("USER")
